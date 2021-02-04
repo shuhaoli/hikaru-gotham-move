@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Hikaru and GothamChess Tell You to MOVE</title>
+        <script src="js/jquery-3.5.1.min.js"></script>
+        <script src="js/bootstrap-4.5.1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-4.5.1.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/popup.css"/>
+        <script src="js/popup.js"></script>
+    </head>
+    <body class="popup-body">
+        <div class="container popup-container">
+            <div class="container-title">
+                <h2>Hikaru and GothamChess Tell You to MOVE</h2>
+            </div>
+
+            <div class="card">
+                <h5 class="card-header">
+                    Settings
+                </h5>
+                <div class="card-body">
+
+                    <div id="savedSuccessfully" class="alert alert-success collapse">
+                        Successfully saved!
+                    </div>
+
+                    <div id="invalidError" class="alert alert-danger collapse">
+                        You think you're cool? That value is obviously invalid
+                    </div>
+
+                    <div id="percentageError" class="alert alert-danger collapse">
+                        How can you have a % of time remaining that's greater than 100? Pepega
+                    </div>
+
+                    <div id="negativeError" class="alert alert-danger collapse">
+                        Negative value? Really?
+                    </div>
+
+                    <h4 class="settings-question">Choose WHO tells you to move:</h4>
+
+                    <select id="who" class="form-select settings-form">
+                        <option value="HikaruGotham">Hikaru and GothamChess</option>
+                        <option value="SoundEffect">A Boring Sound Effect</option>
+                    </select>
+
+                    <h4 class="settings-question settings-question-second">Choose WHEN you will be notified to move:</h4>
+
+                    <div>
+                        <a>After spending</a>
+                        <input type="number" id="number" name="secondsToWait" class="settings-input">
+                        <select id="type" class="form-select settings-form">
+                            <option value="seconds">second(s)</option>
+                            <option value="percentage">% of remaining time</option>
+                        </select>
+                        <a>thinking on one move</a>
+                    </div>
+
+                    <button id="save" type="button" class="btn btn-primary settings-button">Save</button>
+
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

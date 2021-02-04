@@ -1,0 +1,34 @@
+.popup-container {
+    margin-bottom: 30px;
+}
+
+.popup-body {
+    width: 800px;
+}
+
+.container-title {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.settings-question {
+    margin-bottom: 20px;
+}
+
+.settings-question-second {
+    margin-top: 30px;
+}
+
+.settings-form {
+    height: 30px;
+    padding-bottom: 1px;
+}
+
+.settings-input {
+    width: 100px;
+}
+
+.settings-button {
+    margin-top: 25px;
+    width: 100px;
+}
