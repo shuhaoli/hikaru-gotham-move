@@ -23,7 +23,6 @@
     },
     "manifest_version": 2,
     "permissions": [
-        "activeTab",
         "storage"
     ],
     "web_accessible_resources": [

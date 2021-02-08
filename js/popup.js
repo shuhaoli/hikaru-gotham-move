@@ -1,3 +1,12 @@
+$(document).ready(function() {
+    $('#youtube').on('click', function() {
+        chrome.tabs.create({url: 'https://www.youtube.com/c/jackli_gg'});
+    });
+    $('#website').on('click', function() {
+        chrome.tabs.create({url: 'http://www.jackli.gg'});
+    });
+});
+
 function updateElement(elementId, value) {
     let element = document.getElementById(elementId);
     element.value = value;
