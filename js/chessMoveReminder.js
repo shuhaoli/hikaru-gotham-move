@@ -23,16 +23,31 @@ function parseSecondsFromClock(clock) {
     return sec + min * 60 + hour * 3600;
 }
 
+const soundPackData = {
+    Hikaru: {
+        folder: 'Hikaru',
+        voicelineNumber: 15
+    },
+    Gotham: {
+        folder: 'Gotham',
+        voicelineNumber: 5
+    }
+};
+
+const soundPackDataKeys = Object.keys(soundPackData);
+
 function chessMoveReminder() {
     let timer;
-    let seconds = 5;
     let audio;
 
+    let getAudio = function(who){
+        if(!soundPackDataKeys.includes(who)) return 'audio/SoundEffect/SoundEffect.mp3';
+        let {folder, voicelineNumber} = soundPackData[who];
+        return `audio/${folder}/${semiRandomPositiveNumber(voicelineNumber)}.wav`;
+    }
+
     let playAudio = function(who) {
-        let audioUrl = 'audio/SoundEffect/SoundEffect.mp3';
-        if (who === 'HikaruGotham') {
-            audioUrl = 'audio/HikaruGotham/' + semiRandomPositiveNumber(20) + '.wav';
-        }
+        let audioUrl = getAudio(who);
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
             audio.play();
@@ -57,7 +72,7 @@ function chessMoveReminder() {
                 }
                 if (isTurn) {
                     chrome.storage.sync.get({
-                        'who': 'HikaruGotham',
+                        'who': 'Hikaru',
                         'number': 60,
                         'type': 'seconds'
                     }, function(data) {

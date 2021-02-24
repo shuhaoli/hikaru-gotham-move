@@ -14,7 +14,7 @@ function updateElement(elementId, value) {
 
 function update() {
     chrome.storage.sync.get({
-        'who': 'HikaruGotham',
+        'who': 'Hikaru',
         'number': 60,
         'type': 'seconds'
     }, function(data) {
@@ -34,6 +34,8 @@ function showAlert(id) {
     }, 3000);
 }
 
+const availableSoundPack = ['Hikaru', 'Gotham', 'SoundEffect']
+
 document.addEventListener('DOMContentLoaded', function() {
 
     update();
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let number = parseFloat(document.getElementById('number').value);
         let type = document.getElementById('type').value;
 
-        if (who !== 'HikaruGotham' && who !== 'SoundEffect') {
+        if (!availableSoundPack.includes(who)) {
             showAlert('invalidError');
         } else if (type !== 'seconds' && type !== 'percentage') {
             showAlert('invalidError');
