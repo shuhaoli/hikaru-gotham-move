@@ -1,26 +1,26 @@
 {
-  "name": "Hikaru and GothamChess Tell You to MOVE",
-  "version": "0.0.0.2",
-  "description": "Hikaru and GothamChess remind you when you have spent too much time thinking on a move!",
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*.chess.com/live*",
-        "*://*.chess.com/game/live*",
-        "*://*.lichess.org/*"
-      ],
-      "js": ["js/chessMoveReminder.js"]
-    }
-  ],
-  "browser_action": {
-    "default_popup": "popup.html"
-  },
-  "icons": {
-    "16": "icon/icon16.png",
-    "48": "icon/icon48.png",
-    "128": "icon/icon128.png"
-  },
-  "manifest_version": 2,
-  "permissions": ["storage"],
-  "web_accessible_resources": ["audio/*"]
+    "name": "Hikaru and GothamChess Tell You to MOVE",
+    "version": "0.0.0.2",
+    "description": "Hikaru and GothamChess remind you when you have spent too much time thinking on a move!",
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.chess.com/live*",
+                "*://*.chess.com/game/live*",
+                "*://*.lichess.org/*"
+            ],
+            "js": ["js/chessMoveReminder.js"]
+        }
+    ],
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "icon/icon16.png",
+        "48": "icon/icon48.png",
+        "128": "icon/icon128.png"
+    },
+    "manifest_version": 2,
+    "permissions": ["storage"],
+    "web_accessible_resources": ["audio/*"]
 }
