@@ -39,7 +39,6 @@ function chessMoveReminder() {
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
             await audio.play();
-            console.log("play");
         } catch (err) {
             console.log("MOVE Extension: Unable to play audio: " + err.message);
         }
