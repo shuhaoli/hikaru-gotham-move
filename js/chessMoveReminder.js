@@ -30,16 +30,16 @@ function chessMoveReminder() {
     let seconds = 5;
     let audio;
 
-    let playAudio = function(who) {
+    let playAudio = async function(who) {
         let audioUrl = 'audio/SoundEffect/SoundEffect.mp3';
         if (who === 'HikaruGotham') {
-            audioUrl = 'audio/HikaruGotham/' + randomPositiveNumberWithoutRepeat(20) + '.wav';
+            audioUrl = 'audio/HikaruGotham/' + randomPositiveNumberWithoutRepeat(29) + '.wav';
         }
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
-            audio.play();
-        } catch(err) {
-            console.log('Unable to play audio: ' + err.message);
+            await audio.play();
+        } catch (err) {
+            console.log('MOVE Extension: Unable to play audio: ' + err.message);
         }
     }
 
