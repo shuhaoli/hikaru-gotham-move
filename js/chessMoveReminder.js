@@ -1,4 +1,3 @@
-console.log("content script active");
 let observer;
 let recentRandomNumber = 0;
 
@@ -27,25 +26,22 @@ function parseSecondsFromClock(clock) {
 
 function chessMoveReminder() {
   let timer;
-  // let seconds = 5;
   let audio;
 
-  let playAudio = function (who) {
+  let playAudio = async function (who) {
     let audioUrl = "audio/SoundEffect/SoundEffect.mp3";
     if (who === "HikaruGotham") {
       audioUrl =
-        "audio/HikaruGotham/" + randomPositiveNumberWithoutRepeat(20) + ".wav";
+        "audio/HikaruGotham/" + randomPositiveNumberWithoutRepeat(29) + ".wav";
     }
     audio = new Audio(chrome.runtime.getURL(audioUrl));
     try {
-      audio.play();
-      console.log("playing");
+      await audio.play();
+      console.log("play");
     } catch (err) {
-      console.log("Unable to play audio: " + err.message);
+      console.log("MOVE Extension: Unable to play audio: " + err.message);
     }
   };
-
-  // TODO: Change for lichess
   let target =
     document.querySelector("#board-layout-player-bottom .clock-component") ||
     document.querySelector(".rclock-bottom");
@@ -54,51 +50,44 @@ function chessMoveReminder() {
       observer.disconnect();
     }
     observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
-        console.log(mutation);
-        // TODO: Change for lichess (?)
-        let currentClock =
-          mutation.target.querySelector(".time") || mutation.target;
-        // currentClock = currentClock.innerText.replace(/\n/g, "");
-        clearTimeout(timer);
-        // For some reason chess.com/live#g=xxx uses clock-playerTurn
-        // whereas chess.com/game/live/xxx uses clock-player-turn
-        // TODO: Change for lichess
-        let isTurn =
-          mutation.target.classList.contains("clock-playerTurn") ||
-          mutation.target.classList.contains("clock-player-turn") ||
-          mutation.target.classList.contains("running");
-        if (!isTurn && audio !== undefined) {
-          audio.pause();
-        }
-        if (isTurn) {
-          chrome.storage.sync.get(
-            {
-              who: "HikaruGotham",
-              number: 60,
-              type: "seconds",
-            },
-            function (data) {
-              let who = data.who;
-              let number = data.number;
-              let type = data.type;
+      let mutation = mutations[0];
+      let currentClock =
+        mutation.target.querySelector(".time") || mutation.target;
+      clearTimeout(timer);
+      // For some reason chess.com/live#g=xxx uses clock-playerTurn
+      // whereas chess.com/game/live/xxx uses clock-player-turn
+      let isTurn =
+        mutation.target.classList.contains("clock-playerTurn") ||
+        mutation.target.classList.contains("clock-player-turn") ||
+        mutation.target.classList.contains("running");
+      if (!isTurn && audio !== undefined) {
+        audio.pause();
+      }
+      if (isTurn) {
+        chrome.storage.sync.get(
+          {
+            who: "HikaruGotham",
+            number: 60,
+            type: "seconds",
+          },
+          function (data) {
+            let who = data.who;
+            let number = data.number;
+            let type = data.type;
 
-              let timeToWait;
+            let timeToWait;
 
-              if (type === "percentage") {
-                let seconds = parseSecondsFromClock(currentClock) * number * 10;
-                timeToWait = Math.max(seconds, 2000);
-              } else {
-                timeToWait = number * 1000;
-              }
-              timer = setTimeout(playAudio, timeToWait, who);
+            if (type === "percentage") {
+              let seconds = parseSecondsFromClock(currentClock) * number * 10;
+              timeToWait = Math.max(seconds, 2000);
+            } else {
+              timeToWait = number * 1000;
             }
-          );
-        }
-      });
+            timer = setTimeout(playAudio, timeToWait, who);
+          }
+        );
+      }
     });
-
-    console.log("observer made");
 
     observer.observe(target, {
       attributes: true,
