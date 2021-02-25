@@ -1,3 +1,4 @@
+console.log("content script active");
 let observer;
 let recentRandomNumber = 0;
 
@@ -26,7 +27,7 @@ function parseSecondsFromClock(clock) {
 
 function chessMoveReminder() {
   let timer;
-  let seconds = 5;
+  // let seconds = 5;
   let audio;
 
   let playAudio = function (who) {
@@ -38,6 +39,7 @@ function chessMoveReminder() {
     audio = new Audio(chrome.runtime.getURL(audioUrl));
     try {
       audio.play();
+      console.log("playing");
     } catch (err) {
       console.log("Unable to play audio: " + err.message);
     }
@@ -46,15 +48,18 @@ function chessMoveReminder() {
   // TODO: Change for lichess
   let target =
     document.querySelector("#board-layout-player-bottom .clock-component") ||
-    document.querySelector(".rclock-bottom").querySelector(".time");
+    document.querySelector(".rclock-bottom");
   if (target !== null) {
     if (observer !== undefined) {
       observer.disconnect();
     }
     observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
+        console.log(mutation);
         // TODO: Change for lichess (?)
-        let currentClock = mutation.target.innerText.replace(/\n/g, "");
+        let currentClock =
+          mutation.target.querySelector(".time") || mutation.target;
+        // currentClock = currentClock.innerText.replace(/\n/g, "");
         clearTimeout(timer);
         // For some reason chess.com/live#g=xxx uses clock-playerTurn
         // whereas chess.com/game/live/xxx uses clock-player-turn
@@ -62,7 +67,7 @@ function chessMoveReminder() {
         let isTurn =
           mutation.target.classList.contains("clock-playerTurn") ||
           mutation.target.classList.contains("clock-player-turn") ||
-          mutation.target.parentElement.classList.contains("running");
+          mutation.target.classList.contains("running");
         if (!isTurn && audio !== undefined) {
           audio.pause();
         }
@@ -93,9 +98,12 @@ function chessMoveReminder() {
       });
     });
 
+    console.log("observer made");
+
     observer.observe(target, {
       attributes: true,
       attributeFilter: ["class"],
+      attributeOldValue: true,
     });
   }
 }
