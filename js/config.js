@@ -11,7 +11,7 @@ function HIKARU_GOTHAM_CONFIG() {
             },
             Gotham: {
                 folder: 'Gotham',
-                voicelineNumber: 5,
+                voicelineNumber: 14,
             },
             SoundEffect: {
                 folder: 'SoundEffect',

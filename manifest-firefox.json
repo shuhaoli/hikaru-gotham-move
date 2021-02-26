@@ -9,6 +9,7 @@
                 "*://*.chess.com/game/live*"
             ],
             "js": [
+                "js/config.js",
                 "js/chessMoveReminder.js"
             ]
         }

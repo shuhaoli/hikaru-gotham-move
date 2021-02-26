@@ -33,7 +33,7 @@ function chessMoveReminder() {
     let getAudio = function(who){
         let pack = who[randomPositiveNumber(who.length) - 1];
         let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
-        return `audio/${folder}/${semiRandomPositiveNumber(voicelineNumber)}.mp3`;
+        return `audio/${folder}/${randomPositiveNumberWithoutRepeat(voicelineNumber)}.mp3`;
     }
 
     let playAudio = async function(who) {
