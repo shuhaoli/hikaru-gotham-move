@@ -16,11 +16,10 @@ function randomPositiveNumberWithoutRepeat(max) {
 }
 
 function parseSecondsFromClock(clock) {
-    const regex = /((\d):)?((\d)?\d):(\d\d)/;
-    let match = clock.match(regex);
-    let hour = parseInt(match[2] ? match[2] : 0);
-    let min = parseInt(match[3]);
-    let sec = parseInt(match[5]);
+    let split = clock.split(':').reverse();
+    let hour = parseInt(split[2] || 0);
+    let min = parseInt(split[1]);
+    let sec = parseInt(split[0]);
     return sec + min * 60 + hour * 3600;
 }
 
@@ -29,25 +28,25 @@ function chessMoveReminder() {
     let audio;
 
     let playAudio = async function (who) {
-        let audioUrl = "audio/SoundEffect/SoundEffect.mp3";
-        if (who === "HikaruGotham") {
+        let audioUrl = 'audio/SoundEffect/SoundEffect.mp3';
+        if (who === 'HikaruGotham') {
             audioUrl =
-                "audio/HikaruGotham/" +
+                'audio/HikaruGotham/' +
                 randomPositiveNumberWithoutRepeat(29) +
-                ".wav";
+                '.wav';
         }
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
             await audio.play();
-            console.log("play");
+            console.log('play');
         } catch (err) {
-            console.log("MOVE Extension: Unable to play audio: " + err.message);
+            console.log('MOVE Extension: Unable to play audio: ' + err.message);
         }
     };
     let target =
         document.querySelector(
-            "#board-layout-player-bottom .clock-component"
-        ) || document.querySelector(".rclock-bottom");
+            '#board-layout-player-bottom .clock-component'
+        ) || document.querySelector('.rclock-bottom');
     if (target !== null) {
         if (observer !== undefined) {
             observer.disconnect();
@@ -55,23 +54,24 @@ function chessMoveReminder() {
         observer = new MutationObserver(function (mutations) {
             let mutation = mutations[0];
             let currentClock =
-                mutation.target.querySelector(".time") || mutation.target;
+                mutation.target.querySelector('.time') || mutation.target;
+            currentClock = currentClock.innerText.replace('/\n/g', '');
             clearTimeout(timer);
             // For some reason chess.com/live#g=xxx uses clock-playerTurn
             // whereas chess.com/game/live/xxx uses clock-player-turn
             let isTurn =
-                mutation.target.classList.contains("clock-playerTurn") ||
-                mutation.target.classList.contains("clock-player-turn") ||
-                mutation.target.classList.contains("running");
+                mutation.target.classList.contains('clock-playerTurn') ||
+                mutation.target.classList.contains('clock-player-turn') ||
+                mutation.target.classList.contains('running');
             if (!isTurn && audio !== undefined) {
                 audio.pause();
             }
             if (isTurn) {
                 chrome.storage.sync.get(
                     {
-                        who: "HikaruGotham",
+                        who: 'HikaruGotham',
                         number: 60,
-                        type: "seconds",
+                        type: 'seconds',
                     },
                     function (data) {
                         let who = data.who;
@@ -80,7 +80,7 @@ function chessMoveReminder() {
 
                         let timeToWait;
 
-                        if (type === "percentage") {
+                        if (type === 'percentage') {
                             let seconds =
                                 parseSecondsFromClock(currentClock) *
                                 number *
@@ -97,14 +97,13 @@ function chessMoveReminder() {
 
         observer.observe(target, {
             attributes: true,
-            attributeFilter: ["class"],
-            attributeOldValue: true,
+            attributeFilter: ['class'],
         });
     }
 }
 
 setTimeout(chessMoveReminder, 1000);
 
-window.addEventListener("hashchange", function () {
+window.addEventListener('hashchange', function () {
     setTimeout(chessMoveReminder, 1000);
 });
