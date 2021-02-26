@@ -1,3 +1,4 @@
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG()
 let observer;
 let recentRandomNumber = 0;
 
@@ -23,30 +24,18 @@ function parseSecondsFromClock(clock) {
     return sec + min * 60 + hour * 3600;
 }
 
-const soundPackData = {
-    Hikaru: {
-        folder: 'Hikaru',
-        voicelineNumber: 15
-    },
-    Gotham: {
-        folder: 'Gotham',
-        voicelineNumber: 5
-    }
-};
-
-const soundPackDataKeys = Object.keys(soundPackData);
-
 function chessMoveReminder() {
     let timer;
     let audio;
 
     let getAudio = function(who){
-        if(!soundPackDataKeys.includes(who)) return 'audio/SoundEffect/SoundEffect.mp3';
-        let {folder, voicelineNumber} = soundPackData[who];
-        return `audio/${folder}/${semiRandomPositiveNumber(voicelineNumber)}.wav`;
+        let pack = who[randomPositiveNumber(who.length) - 1];
+        let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
+        return `audio/${folder}/${semiRandomPositiveNumber(voicelineNumber)}.mp3`;
     }
 
     let playAudio = function(who) {
+        if(!who.length) return;
         let audioUrl = getAudio(who);
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
@@ -72,11 +61,11 @@ function chessMoveReminder() {
                 }
                 if (isTurn) {
                     chrome.storage.sync.get({
-                        'who': 'Hikaru',
+                        'who': DEFAULT_SOUND_PACK,
                         'number': 60,
                         'type': 'seconds'
                     }, function(data) {
-                        let who = data.who;
+                        let who = typeof data.who === "object" ? data.who : OLD_PACK_LOOKUP[data.who];
                         let number = data.number;
                         let type = data.type;
 
