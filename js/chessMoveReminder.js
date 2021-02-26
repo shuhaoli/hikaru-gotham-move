@@ -6,11 +6,13 @@ function randomPositiveNumber(max) {
     return Math.floor(Math.random() * max) + 1;
 }
 
-function semiRandomPositiveNumber(max) {
-    let result = randomPositiveNumber(max);
-    while (recentRandomNumber === result) {
+function randomPositiveNumberWithoutRepeat(max) {
+    let result;
+    do {
         result = randomPositiveNumber(max);
     }
+    while (recentRandomNumber === result);
+
     recentRandomNumber = result;
     return result;
 }
@@ -34,28 +36,30 @@ function chessMoveReminder() {
         return `audio/${folder}/${semiRandomPositiveNumber(voicelineNumber)}.mp3`;
     }
 
-    let playAudio = function(who) {
+    let playAudio = async function(who) {
         if(!who.length) return;
         let audioUrl = getAudio(who);
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
-            audio.play();
-        } catch(err) {
-            console.log('Unable to play audio: ' + err.message);
+            await audio.play();
+        } catch (err) {
+            console.log('MOVE Extension: Unable to play audio: ' + err.message);
         }
     }
 
     let target = document.querySelector('#board-layout-player-bottom .clock-component');
-
     if (target !== null) {
         if (observer !== undefined) {
             observer.disconnect();
         }
         observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-                let currentClock = mutation.target.attributes.getNamedItem('data-clock').value;
+                let currentClock = mutation.target.innerText;
                 clearTimeout(timer);
-                let isTurn = mutation.target.classList.contains('clock-playerTurn');
+                // For some reason chess.com/live#g=xxx uses clock-playerTurn
+                // whereas chess.com/game/live/xxx uses clock-player-turn
+                let isTurn = mutation.target.classList.contains('clock-playerTurn')
+                    || mutation.target.classList.contains('clock-player-turn');
                 if (!isTurn && audio !== undefined) {
                     audio.pause();
                 }
