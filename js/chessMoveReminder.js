@@ -65,7 +65,7 @@ function chessMoveReminder() {
                         'number': 60,
                         'type': 'seconds'
                     }, function(data) {
-                        let who = typeof data.who === "object" ? data.who : OLD_PACK_LOOKUP[data.who];
+                        let who = typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who];
                         let number = data.number;
                         let type = data.type;
 

@@ -12,10 +12,10 @@ let selectedSoundPack = [];
 
 function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
     if (!initialValues) {
-      selectedSoundPack = [...document.querySelectorAll("#who input[type=checkbox]:checked")];
+        selectedSoundPack = [...document.querySelectorAll('#who input[type=checkbox]:checked')];
     } else {
-      initialValues.forEach(id => document.getElementById(id).checked = true)
-      selectedSoundPack = initialValues
+        initialValues.forEach(id => document.getElementById(id).checked = true)
+        selectedSoundPack = initialValues
     }
 }
 
@@ -30,7 +30,7 @@ function updateCheckboxes({ value, checked }) {
 }
 
 function onPackContainerClick(event) {
-    if (event.target.tagName !== "INPUT") return;
+    if (event.target.tagName !== 'INPUT') return;
     updateCheckboxes(event.target)
 }
 
@@ -41,7 +41,7 @@ function update() {
         'type': 'seconds'
     }, function(data) {
         // Fallback for version upgrade
-        initCheckboxes(typeof data.who === "object" ? data.who : OLD_PACK_LOOKUP[data.who]);
+        initCheckboxes(typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who]);
         updateElement('number', data.number);
         updateElement('type', data.type);
     });
@@ -58,7 +58,7 @@ function showAlert(id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById("who").addEventListener("click", onPackContainerClick);
+    document.getElementById('who').addEventListener('click', onPackContainerClick);
 
     update();
 
