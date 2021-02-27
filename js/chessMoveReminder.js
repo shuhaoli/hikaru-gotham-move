@@ -1,4 +1,5 @@
 let observer;
+let oldHref = document.location.href;
 let recentRandomNumber = 0;
 
 function randomPositiveNumber(max) {
@@ -64,7 +65,7 @@ function chessMoveReminder() {
                 mutation.target.classList.contains('clock-playerTurn') ||
                 mutation.target.classList.contains('clock-player-turn') ||
                 mutation.target.classList.contains('running');
-            if (!isTurn && audio !== undefined) {
+            if (audio !== undefined) {
                 audio.pause();
             }
             if (isTurn) {
@@ -106,6 +107,20 @@ function chessMoveReminder() {
 
 setTimeout(chessMoveReminder, 1000);
 
-window.addEventListener('hashchange', function () {
-    setTimeout(chessMoveReminder, 1000);
-});
+window.onload = function () {
+    let bodyList = document.querySelector('body');
+    let pageReloadObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (oldHref !== document.location.href) {
+                oldHref = document.location.href;
+                setTimeout(chessMoveReminder, 1000);
+            }
+        });
+    });
+    let config = {
+        childList: true,
+        subtree: true,
+    };
+
+    pageReloadObserver.observe(bodyList, config);
+};
