@@ -20,7 +20,7 @@ function HIKARU_GOTHAM_CONFIG() {
         },
         DEFAULT_SOUND_PACK: ['Hikaru', 'Gotham'],
         get AVAILABLE_SOUND_PACK() {
-            return Object.keys(SOUND_PACK_DATA)
+            return Object.keys(this.SOUND_PACK_DATA)
         },
     }
 }
