@@ -53,6 +53,7 @@ function chessMoveReminder() {
         }
         observer = new MutationObserver(function (mutations) {
             let mutation = mutations[0];
+            console.log(mutation.target.classList);
             let currentClock =
                 mutation.target.querySelector('.time') || mutation.target;
             currentClock = currentClock.innerText.replace('/\n/g', '');
@@ -98,6 +99,7 @@ function chessMoveReminder() {
         observer.observe(target, {
             attributes: true,
             attributeFilter: ['class'],
+            attributeOldValue: true,
         });
     }
 }
