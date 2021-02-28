@@ -39,7 +39,6 @@ function chessMoveReminder() {
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
             await audio.play();
-            console.log('play');
         } catch (err) {
             console.log('MOVE Extension: Unable to play audio: ' + err.message);
         }
@@ -54,7 +53,6 @@ function chessMoveReminder() {
         }
         observer = new MutationObserver(function (mutations) {
             let mutation = mutations[0];
-            console.log(mutation.target.classList);
             let currentClock =
                 mutation.target.querySelector('.time') || mutation.target;
             currentClock = currentClock.innerText.replace('/\n/g', '');
@@ -65,10 +63,15 @@ function chessMoveReminder() {
                 mutation.target.classList.contains('clock-playerTurn') ||
                 mutation.target.classList.contains('clock-player-turn') ||
                 mutation.target.classList.contains('running');
-            if (audio !== undefined) {
+            if (
+                audio !== undefined &&
+                mutation.oldValue !== mutation.target.classList.value
+            )
                 audio.pause();
-            }
-            if (isTurn) {
+            if (
+                isTurn &&
+                mutation.oldValue !== mutation.target.classList.value
+            ) {
                 chrome.storage.sync.get(
                     {
                         who: 'HikaruGotham',
@@ -76,10 +79,10 @@ function chessMoveReminder() {
                         type: 'seconds',
                     },
                     function (data) {
-                        let who = data.who;
-                        let number = data.number;
-                        let type = data.type;
-
+                        // let who = data.who;
+                        // let number = data.number;
+                        // let type = data.type;
+                        let { who, number, type } = data;
                         let timeToWait;
 
                         if (type === 'percentage') {
