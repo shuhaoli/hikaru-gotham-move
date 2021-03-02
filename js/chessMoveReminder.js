@@ -100,7 +100,6 @@ function chessMoveReminder() {
         observer.observe(target, {
             attributes: true,
             attributeFilter: ['class'],
-            attributeOldValue: true,
         });
     }
 }
