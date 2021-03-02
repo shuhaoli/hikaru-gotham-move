@@ -1,4 +1,5 @@
 let observer;
+let oldHref = document.location.href;
 let recentRandomNumber = 0;
 
 function randomPositiveNumber(max) {
@@ -9,31 +10,31 @@ function randomPositiveNumberWithoutRepeat(max) {
     let result;
     do {
         result = randomPositiveNumber(max);
-    }
-    while (recentRandomNumber === result);
+    } while (recentRandomNumber === result);
 
     recentRandomNumber = result;
     return result;
 }
 
 function parseSecondsFromClock(clock) {
-    const regex = /((\d):)?((\d)?\d):(\d\d)/;
-    let match = clock.match(regex);
-    let hour = parseInt(match[2] ? match[2] : 0);
-    let min = parseInt(match[3]);
-    let sec = parseInt(match[5]);
+    let split = clock.split(':').reverse();
+    let hour = parseInt(split[2] || 0);
+    let min = parseInt(split[1]);
+    let sec = parseInt(split[0]);
     return sec + min * 60 + hour * 3600;
 }
 
 function chessMoveReminder() {
     let timer;
-    let seconds = 5;
     let audio;
 
-    let playAudio = async function(who) {
+    let playAudio = async function (who) {
         let audioUrl = 'audio/SoundEffect/SoundEffect.mp3';
         if (who === 'HikaruGotham') {
-            audioUrl = 'audio/HikaruGotham/' + randomPositiveNumberWithoutRepeat(29) + '.wav';
+            audioUrl =
+                'audio/HikaruGotham/' +
+                randomPositiveNumberWithoutRepeat(29) +
+                '.wav';
         }
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
@@ -41,57 +42,84 @@ function chessMoveReminder() {
         } catch (err) {
             console.log('MOVE Extension: Unable to play audio: ' + err.message);
         }
-    }
+    };
 
-    let target = document.querySelector('#board-layout-player-bottom .clock-component');
+    let target =
+        document.querySelector(
+            '#board-layout-player-bottom .clock-component'
+        ) || document.querySelector('.rclock-bottom');
+
     if (target !== null) {
         if (observer !== undefined) {
             observer.disconnect();
         }
-        observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                let currentClock = mutation.target.innerText;
-                clearTimeout(timer);
-                // For some reason chess.com/live#g=xxx uses clock-playerTurn
-                // whereas chess.com/game/live/xxx uses clock-player-turn
-                let isTurn = mutation.target.classList.contains('clock-playerTurn')
-                    || mutation.target.classList.contains('clock-player-turn');
-                if (!isTurn && audio !== undefined) {
-                    audio.pause();
-                }
+
+        observer = new MutationObserver(function (mutations) {
+            let mutation = mutations[0];
+            let currentClock =
+                mutation.target.querySelector('.time') || mutation.target;
+            currentClock = currentClock.innerText.replace('/\n/g', '');
+            clearTimeout(timer);
+
+            // For some reason chess.com/live#g=xxx uses clock-playerTurn
+            // whereas chess.com/game/live/xxx uses clock-player-turn
+            let isTurn =
+                mutation.target.classList.contains('clock-playerTurn') ||
+                mutation.target.classList.contains('clock-player-turn') ||
+                mutation.target.classList.contains('running');
+
+            if (mutation.oldValue !== mutation.target.classList.value) {
+                if (audio !== undefined) audio.pause();
                 if (isTurn) {
-                    chrome.storage.sync.get({
-                        'who': 'HikaruGotham',
-                        'number': 60,
-                        'type': 'seconds'
-                    }, function(data) {
-                        let who = data.who;
-                        let number = data.number;
-                        let type = data.type;
+                    chrome.storage.sync.get(
+                        {
+                            who: 'HikaruGotham',
+                            number: 60,
+                            type: 'seconds',
+                        },
+                        function (data) {
+                            let { who, number, type } = data;
+                            let timeToWait;
 
-                        let timeToWait;
-
-                        if (type === 'percentage') {
-                            let seconds = parseSecondsFromClock(currentClock) * number * 10;
-                            timeToWait = Math.max(seconds, 2000);
-                        } else {
-                            timeToWait = number * 1000;
+                            if (type === 'percentage') {
+                                let seconds =
+                                    parseSecondsFromClock(currentClock) *
+                                    number *
+                                    10;
+                                timeToWait = Math.max(seconds, 2000);
+                            } else {
+                                timeToWait = number * 1000;
+                            }
+                            timer = setTimeout(playAudio, timeToWait, who);
                         }
-                        timer = setTimeout(playAudio, timeToWait, who);
-                    });
+                    );
                 }
-            });
+            }
         });
 
         observer.observe(target, {
-            attributes:true,
-            attributeFilter:['class']
+            attributes: true,
+            attributeFilter: ['class'],
         });
     }
 }
 
 setTimeout(chessMoveReminder, 1000);
 
-window.addEventListener('hashchange', function() {
-    setTimeout(chessMoveReminder, 1000);
-});
+window.onload = function () {
+    let bodyList = document.querySelector('body');
+    let pageReloadObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (oldHref !== document.location.href) {
+                oldHref = document.location.href;
+                setTimeout(chessMoveReminder, 1000);
+            }
+        });
+    });
+    let config = {
+        childList: true,
+        subtree: true,
+    };
+
+    pageReloadObserver.observe(bodyList, config);
+};
