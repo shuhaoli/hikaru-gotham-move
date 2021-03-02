@@ -1,12 +1,13 @@
 {
     "name": "Hikaru and GothamChess Tell You to MOVE",
-    "version": "0.0.0.2",
+    "version": "0.0.0.4",
     "description": "Hikaru and GothamChess remind you when you have spent too much time thinking on a move!",
     "content_scripts": [
         {
             "matches": [
                 "*://*.chess.com/live*",
-                "*://*.chess.com/game/live*"
+                "*://*.chess.com/game/live*",
+                "*://*.lichess.org/*"
             ],
             "js": [
                 "js/config.js",
@@ -23,12 +24,8 @@
         "128": "icon/icon128.png"
     },
     "manifest_version": 2,
-    "permissions": [
-        "storage"
-    ],
-    "web_accessible_resources": [
-        "audio/*"
-    ],
+    "permissions": ["storage"],
+    "web_accessible_resources": ["audio/*"],
     "browser_specific_settings": {
         "gecko": {
             "id": "firefox@jackli.gg"
