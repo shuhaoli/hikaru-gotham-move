@@ -6,11 +6,10 @@
         {
             "matches": [
                 "*://*.chess.com/live*",
-                "*://*.chess.com/game/live*"
+                "*://*.chess.com/game/live*",
+                "*://*.lichess.org/*"
             ],
-            "js": [
-                "js/chessMoveReminder.js"
-            ]
+            "js": ["js/chessMoveReminder.js"]
         }
     ],
     "browser_action": {
@@ -22,10 +21,6 @@
         "128": "icon/icon128.png"
     },
     "manifest_version": 2,
-    "permissions": [
-        "storage"
-    ],
-    "web_accessible_resources": [
-        "audio/*"
-    ]
+    "permissions": ["storage"],
+    "web_accessible_resources": ["audio/*"]
 }
