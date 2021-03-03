@@ -1,6 +1,6 @@
 {
     "name": "Hikaru and GothamChess Tell You to MOVE",
-    "version": "0.0.0.4",
+    "version": "0.0.0.5",
     "description": "Hikaru and GothamChess remind you when you have spent too much time thinking on a move!",
     "content_scripts": [
         {
@@ -9,7 +9,10 @@
                 "*://*.chess.com/game/live*",
                 "*://*.lichess.org/*"
             ],
-            "js": ["js/chessMoveReminder.js"]
+            "js": [
+                "js/config.js",
+                "js/chessMoveReminder.js"
+            ]
         }
     ],
     "browser_action": {
