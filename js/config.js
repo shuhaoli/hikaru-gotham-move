@@ -22,5 +22,5 @@ function HIKARU_GOTHAM_CONFIG() {
         get AVAILABLE_SOUND_PACK() {
             return Object.keys(this.SOUND_PACK_DATA)
         },
-    }
+    };
 }

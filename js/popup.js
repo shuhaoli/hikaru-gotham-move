@@ -7,15 +7,15 @@ $(document).ready(function() {
     });
 });
 
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG()
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
 let selectedSoundPack = [];
 
 function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
     if (!initialValues) {
         selectedSoundPack = [...document.querySelectorAll('#who input[type=checkbox]:checked')];
     } else {
-        initialValues.forEach(id => document.getElementById(id).checked = true)
-        selectedSoundPack = initialValues
+        initialValues.forEach(id => document.getElementById(id).checked = true);
+        selectedSoundPack = initialValues;
     }
 }
 
@@ -25,13 +25,12 @@ function updateElement(elementId, value) {
 }
 
 function updateCheckboxes({ value, checked }) {
-    selectedSoundPack = checked ? selectedSoundPack.concat(value) : selectedSoundPack.filter(who => who !== value)
-    console.log(selectedSoundPack)
+    selectedSoundPack = checked ? selectedSoundPack.concat(value) : selectedSoundPack.filter(who => who !== value);
 }
 
 function onPackContainerClick(event) {
     if (event.target.tagName !== 'INPUT') return;
-    updateCheckboxes(event.target)
+    updateCheckboxes(event.target);
 }
 
 function update() {

@@ -1,4 +1,4 @@
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG()
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
@@ -29,15 +29,15 @@ function chessMoveReminder() {
     let timer;
     let audio;
 
-    let getAudio = function(who){
+    let getAudio = function(who) {
         let pack = who[randomPositiveNumber(who.length) - 1];
         let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
-        let audioIndex = voicelineNumber === 1 ? 1 : randomPositiveNumberWithoutRepeat(voicelineNumber)
+        let audioIndex = voicelineNumber === 1 ? 1 : randomPositiveNumberWithoutRepeat(voicelineNumber);
         return `audio/${folder}/${audioIndex}.mp3`;
     }
 
     let playAudio = async function(who) {
-        if(!who.length) return;
+        if (!who.length) return;
         let audioUrl = getAudio(who);
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
@@ -104,6 +104,7 @@ function chessMoveReminder() {
         observer.observe(target, {
             attributes: true,
             attributeFilter: ['class'],
+            attributeOldValue: true,
         });
     }
 }
