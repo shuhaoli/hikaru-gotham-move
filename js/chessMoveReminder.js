@@ -1,3 +1,4 @@
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG()
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
@@ -28,14 +29,16 @@ function chessMoveReminder() {
     let timer;
     let audio;
 
-    let playAudio = async function (who) {
-        let audioUrl = 'audio/SoundEffect/SoundEffect.mp3';
-        if (who === 'HikaruGotham') {
-            audioUrl =
-                'audio/HikaruGotham/' +
-                randomPositiveNumberWithoutRepeat(29) +
-                '.wav';
-        }
+    let getAudio = function(who){
+        let pack = who[randomPositiveNumber(who.length) - 1];
+        let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
+        let audioIndex = voicelineNumber === 1 ? 1 : randomPositiveNumberWithoutRepeat(voicelineNumber)
+        return `audio/${folder}/${audioIndex}.mp3`;
+    }
+
+    let playAudio = async function(who) {
+        if(!who.length) return;
+        let audioUrl = getAudio(who);
         audio = new Audio(chrome.runtime.getURL(audioUrl));
         try {
             await audio.play();
@@ -73,12 +76,13 @@ function chessMoveReminder() {
                 if (isTurn) {
                     chrome.storage.sync.get(
                         {
-                            who: 'HikaruGotham',
+                            who: DEFAULT_SOUND_PACK,
                             number: 60,
                             type: 'seconds',
                         },
                         function (data) {
-                            let { who, number, type } = data;
+                            let who = typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who];
+                            let { number, type } = data;
                             let timeToWait;
 
                             if (type === 'percentage') {

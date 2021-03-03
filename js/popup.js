@@ -7,18 +7,41 @@ $(document).ready(function() {
     });
 });
 
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG()
+let selectedSoundPack = [];
+
+function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
+    if (!initialValues) {
+        selectedSoundPack = [...document.querySelectorAll('#who input[type=checkbox]:checked')];
+    } else {
+        initialValues.forEach(id => document.getElementById(id).checked = true)
+        selectedSoundPack = initialValues
+    }
+}
+
 function updateElement(elementId, value) {
     let element = document.getElementById(elementId);
     element.value = value;
 }
 
+function updateCheckboxes({ value, checked }) {
+    selectedSoundPack = checked ? selectedSoundPack.concat(value) : selectedSoundPack.filter(who => who !== value)
+    console.log(selectedSoundPack)
+}
+
+function onPackContainerClick(event) {
+    if (event.target.tagName !== 'INPUT') return;
+    updateCheckboxes(event.target)
+}
+
 function update() {
     chrome.storage.sync.get({
-        'who': 'HikaruGotham',
+        'who': DEFAULT_SOUND_PACK,
         'number': 60,
         'type': 'seconds'
     }, function(data) {
-        updateElement('who', data.who);
+        // Fallback for version upgrade
+        initCheckboxes(typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who]);
         updateElement('number', data.number);
         updateElement('type', data.type);
     });
@@ -35,16 +58,16 @@ function showAlert(id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('who').addEventListener('click', onPackContainerClick);
 
     update();
 
     let saveButton = document.getElementById('save');
     saveButton.addEventListener('click', function() {
-        let who = document.getElementById('who').value;
         let number = parseFloat(document.getElementById('number').value);
         let type = document.getElementById('type').value;
 
-        if (who !== 'HikaruGotham' && who !== 'SoundEffect') {
+        if (!selectedSoundPack.every(pack => AVAILABLE_SOUND_PACK.includes(pack))) {
             showAlert('invalidError');
         } else if (type !== 'seconds' && type !== 'percentage') {
             showAlert('invalidError');
@@ -54,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showAlert('percentageError');
         } else {
             chrome.storage.sync.set({
-                who: who,
+                who: selectedSoundPack,
                 number: number,
                 type: type
             });

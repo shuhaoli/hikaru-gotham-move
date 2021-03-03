@@ -9,7 +9,10 @@
                 "*://*.chess.com/game/live*",
                 "*://*.lichess.org/*"
             ],
-            "js": ["js/chessMoveReminder.js"]
+            "js": [
+                "js/config.js",
+                "js/chessMoveReminder.js"
+            ]
         }
     ],
     "browser_action": {
