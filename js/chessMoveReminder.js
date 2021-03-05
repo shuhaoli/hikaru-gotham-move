@@ -1,4 +1,4 @@
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
