@@ -44,7 +44,7 @@ function dismissAlert(element){
     element.className += " alertOut";
     setTimeout(function() {
         element.remove();
-    }, 1000);
+    }, 500);
 }
 
 function newAlert(type = "primary", message = "", prevAlertId){
@@ -65,7 +65,7 @@ function newAlert(type = "primary", message = "", prevAlertId){
     // Make the new alert auto-dismiss on time.
     return setTimeout(function() {
         dismissAlert(document.getElementById("alertBox"))
-    }, 3000);
+    }, 3500);
 }
 
 function showAlert(alertType){

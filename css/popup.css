@@ -76,9 +76,9 @@
 }
 
 .alert {
-    animation: alertInAnimation 1s forwards;
+    animation: alertInAnimation .5s forwards;
 }
 
 .alert.alertOut {
-    animation: alertOutAnimation 1s forwards;
+    animation: alertOutAnimation .5s forwards;
 }
