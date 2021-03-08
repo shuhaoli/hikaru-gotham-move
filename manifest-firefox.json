@@ -1,6 +1,6 @@
 {
     "name": "Hikaru and GothamChess Tell You to MOVE",
-    "version": "0.0.0.5",
+    "version": "0.0.0.6",
     "description": "Hikaru and GothamChess remind you when you have spent too much time thinking on a move!",
     "content_scripts": [
         {
