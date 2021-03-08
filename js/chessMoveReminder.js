@@ -1,7 +1,10 @@
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
+
+let timer;
+let audio;
 
 function randomPositiveNumber(max) {
     return Math.floor(Math.random() * max) + 1;
@@ -25,28 +28,25 @@ function parseSecondsFromClock(clock) {
     return sec + min * 60 + hour * 3600;
 }
 
-function chessMoveReminder() {
-    let timer;
-    let audio;
+function getAudio(who) {
+    let pack = who[randomPositiveNumber(who.length) - 1];
+    let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
+    let audioIndex = voicelineNumber === 1 ? 1 : randomPositiveNumberWithoutRepeat(voicelineNumber);
+    return `audio/${folder}/${audioIndex}.mp3`;
+}
 
-    let getAudio = function(who) {
-        let pack = who[randomPositiveNumber(who.length) - 1];
-        let {folder, voicelineNumber} = SOUND_PACK_DATA[pack];
-        let audioIndex = voicelineNumber === 1 ? 1 : randomPositiveNumberWithoutRepeat(voicelineNumber);
-        return `audio/${folder}/${audioIndex}.mp3`;
+async function playAudio(who) {
+    if (!who.length) return;
+    let audioUrl = getAudio(who);
+    audio = new Audio(chrome.runtime.getURL(audioUrl));
+    try {
+        await audio.play();
+    } catch (err) {
+        console.log('MOVE Extension: Unable to play audio: ' + err.message);
     }
+};
 
-    let playAudio = async function(who) {
-        if (!who.length) return;
-        let audioUrl = getAudio(who);
-        audio = new Audio(chrome.runtime.getURL(audioUrl));
-        try {
-            await audio.play();
-        } catch (err) {
-            console.log('MOVE Extension: Unable to play audio: ' + err.message);
-        }
-    };
-
+function chessMoveReminder() {
     let target =
         document.querySelector(
             '#board-layout-player-bottom .clock-component'
@@ -111,7 +111,10 @@ function chessMoveReminder() {
 
 setTimeout(chessMoveReminder, 1000);
 
-window.onload = function () {
+let existingWindowOnload = window.onload;
+window.onload = function() {
+    // Lichess on Firefox breaks because we overrode the window.onload
+    existingWindowOnload && existingWindowOnload();
     let bodyList = document.querySelector('body');
     let pageReloadObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {

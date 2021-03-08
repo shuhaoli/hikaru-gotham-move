@@ -2,9 +2,6 @@
 <html>
     <head>
         <title>Hikaru and GothamChess Tell You to MOVE</title>
-        <script src="js/jquery-3.5.1.min.js"></script>
-        <script src="js/bootstrap-4.5.1.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="css/fontawesome.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/bootstrap-4.5.1.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/popup.css"/>
         <script src="js/config.js"></script>
@@ -22,21 +19,7 @@
                 </h5>
                 <div class="card-body">
 
-                    <div id="savedSuccessfully" class="alert alert-success collapse">
-                        Successfully saved!
-                    </div>
-
-                    <div id="invalidError" class="alert alert-danger collapse">
-                        You think you're cool? That value is obviously invalid
-                    </div>
-
-                    <div id="percentageError" class="alert alert-danger collapse">
-                        How can you have a % of time remaining that's greater than 100? Pepega
-                    </div>
-
-                    <div id="negativeError" class="alert alert-danger collapse">
-                        Negative value? Really?
-                    </div>
+                    <div id="alertArea"></div>
 
                     <h4 class="settings-question">Choose WHO tells you to move:</h4>
 
@@ -76,12 +59,19 @@
                     <button id="save" type="button" class="btn btn-primary settings-button">Save</button>
 
                 </div>
-            <div class="card-footer">
-                <div class="text-right">
-                <button id="youtube" type="button" class="btn btn-danger btn-sm footer-button"><i class="fab fa-youtube"></i> Jack Li</button>
-                <button id="website" type="button" class="btn btn-info btn-sm footer-button"><i class="fas fa-home"></i> jackli.gg</button>
-            </div>
-            </div>
+
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button id="youtube" type="button" class="btn btn-danger btn-sm footer-button">
+                            <img src="./images/youtube.svg" alt="Youtube" width="16" height="16" style="vertical-align: bottom; margin: 2px 0;">
+                            Jack Li
+                        </button>
+                        <button id="website" type="button" class="btn btn-info btn-sm footer-button">
+                            <img src="./images/home.svg" alt="Homepage" width="16" height="16" style="vertical-align: bottom; margin: 2px 0;">
+                            jackli.gg
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
