@@ -1,13 +1,4 @@
-$(document).ready(function() {
-    $('#youtube').on('click', function() {
-        chrome.tabs.create({url: 'https://www.youtube.com/c/jackli_gg'});
-    });
-    $('#website').on('click', function() {
-        chrome.tabs.create({url: 'http://www.jackli.gg'});
-    });
-});
-
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK, ALERT_DATA } = HIKARU_GOTHAM_CONFIG();
 let selectedSoundPack = [];
 
 function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
@@ -46,17 +37,51 @@ function update() {
     });
 }
 
-let alertTimer;
+let prevAlertId;
 
-function showAlert(id) {
-    clearTimeout(alertTimer);
-    $('#' + id).animate({ opacity: 100 }, 0).show();
-    alertTimer = setTimeout(function() {
-        $('#' + id).animate({ opacity: 0 }, 500).hide('slow');
-    }, 3000);
+function dismissAlert(element){
+    element.id = "";
+    element.className += " alertOut";
+    setTimeout(function() {
+        element.remove();
+    }, 500);
+}
+
+function newAlert(type = "primary", message = "", prevAlertId){
+    // The alert must contain a message.
+    if(!message) return;
+    // Force dismiss previous alert if not.
+    clearTimeout(prevAlertId);
+    const prevAlertEl = document.getElementById("alertBox");
+    if (prevAlertEl) dismissAlert(prevAlertEl);
+    // Create a new alert.
+    const newAlert = document.createElement('div');
+    newAlert.id = "alertBox";
+    newAlert.className = "alert alert-" + type;
+    newAlert.appendChild(document.createTextNode(message));
+    // Append to the alert area.
+    const alertArea = document.getElementById("alertArea");
+    alertArea.insertBefore(newAlert, alertArea.childNodes[0]);
+    // Make the new alert auto-dismiss on time.
+    return setTimeout(function() {
+        dismissAlert(document.getElementById("alertBox"))
+    }, 3500);
+}
+
+function showAlert(alertType){
+    const {type, message} = ALERT_DATA[alertType]
+    prevAlertId = newAlert(type, message, prevAlertId);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("youtube").addEventListener("click", function() {
+        chrome.tabs.create({url: 'https://www.youtube.com/c/jackli_gg'});
+    })
+    
+    document.getElementById("website").addEventListener("click", function() {
+        chrome.tabs.create({url: 'http://www.jackli.gg'});
+    })
+
     document.getElementById('who').addEventListener('click', onPackContainerClick);
 
     update();
