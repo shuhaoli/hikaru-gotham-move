@@ -84,7 +84,6 @@
 }
 
 .repeatEnabled:not(:checked) + .repeatEnabledOptions {
-    cursor: not-allowed;
     opacity: .5;
 }
 
