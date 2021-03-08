@@ -22,6 +22,16 @@ function HIKARU_GOTHAM_CONFIG() {
         get AVAILABLE_SOUND_PACK() {
             return Object.keys(this.SOUND_PACK_DATA)
         },
+        get DEFAULT_STORAGE() {
+            return {
+                who: this.DEFAULT_SOUND_PACK,
+                number: 60,
+                type: 'seconds',
+                repeatEnabled: true,
+                repeatNumber: 10,
+                repeatType: 'seconds',
+            }
+        },
         ALERT_DATA: {
             'savedSuccessfully': {
                 type: "success", 

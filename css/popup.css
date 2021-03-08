@@ -82,3 +82,13 @@
 .alert.alertOut {
     animation: alertOutAnimation .5s forwards;
 }
+
+.repeatEnabled:not(:checked) + .repeatEnabledOptions {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+.repeatEnabled:not(:checked) + .repeatEnabledOptions > input,
+.repeatEnabled:not(:checked) + .repeatEnabledOptions > select {
+    pointer-events: none;
+}
