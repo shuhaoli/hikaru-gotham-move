@@ -131,6 +131,7 @@ window.onload = function() {
     let pageReloadObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
             if (oldHref !== document.location.href) {
+                clearTimeout(timer);
                 oldHref = document.location.href;
                 setTimeout(chessMoveReminder, 1000);
             }
