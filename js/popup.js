@@ -1,4 +1,4 @@
-const { OLD_PACK_LOOKUP, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK, DEFAULT_STORAGE, ALERT_DATA } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK, DEFAULT_STORAGE, ALERT_DATA, MIN_REPEAT_TIME_SECOND } = HIKARU_GOTHAM_CONFIG();
 let selectedSoundPack = [];
 
 function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
@@ -32,6 +32,7 @@ function update() {
         document.getElementById('repeatEnabled').checked = repeatEnabled;
         updateElement('repeatNumber', repeatNumber);
         updateElement('repeatType', repeatType);
+        document.getElementById('repeatNumber').min = repeatType === 'percentage' ? 1 : MIN_REPEAT_TIME_SECOND;
     });
 }
 
@@ -71,6 +72,15 @@ function showAlert(alertType){
     prevAlertId = newAlert(type, message, prevAlertId);
 }
 
+function onRepeatTypeChange(event) {
+    const repeatNumberElement = document.getElementById("repeatNumber");
+    const isRepeatTimePercentage = event.target.value === 'percentage';
+    repeatNumberElement.min = isRepeatTimePercentage ? 1 : MIN_REPEAT_TIME_SECOND;
+    if(isRepeatTimePercentage && repeatNumberElement.value < MIN_REPEAT_TIME_SECOND) {
+        repeatNumberElement.value = MIN_REPEAT_TIME_SECOND;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("youtube").addEventListener("click", function() {
         chrome.tabs.create({url: 'https://www.youtube.com/c/jackli_gg'});
@@ -81,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('who').addEventListener('click', onPackContainerClick);
+
+    document.getElementById('repeatType').addEventListener('change', onRepeatTypeChange);
 
     update();
 
@@ -93,12 +105,19 @@ document.addEventListener('DOMContentLoaded', function() {
         let repeatType = document.getElementById('repeatType').value;
 
         if (!selectedSoundPack.every(pack => AVAILABLE_SOUND_PACK.includes(pack))) return showAlert('invalidError');
-        if (number < 0) return showAlert('negativeError');
+
         if (!['seconds', 'percentage'].includes(type)) return showAlert('invalidError');
+        if (number < 0) return showAlert('negativeError');
         if (type === 'percentage' && number > 100) return showAlert('percentageError');
-        if (repeatNumber < 0) return showAlert('negativeError');
-        if (!['seconds', 'percentage'].includes(repeatType)) return showAlert('invalidError');
-        if (repeatType === 'percentage' && number > 100) return showAlert('percentageError');
+
+        if (repeatType === 'percentage'){
+            if (repeatNumber > 100) return showAlert('percentageError');
+            if (repeatNumber < 1) return showAlert('repeatTooLowError');
+        } else if (repeatType === 'seconds') {
+            if (repeatNumber < MIN_REPEAT_TIME_SECOND) return showAlert('repeatTooLowError');
+        } else {
+            return showAlert('invalidError');
+        }
 
         chrome.storage.sync.set({
             who: selectedSoundPack,

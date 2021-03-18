@@ -1,4 +1,4 @@
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK, DEFAULT_STORAGE } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK, DEFAULT_STORAGE, MIN_REPEAT_TIME, MIN_PERCENTAGE_TIME } = HIKARU_GOTHAM_CONFIG();
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
@@ -47,6 +47,11 @@ async function playAudio(who) {
     }
 };
 
+function calcTime(currentClock, type, number) {
+    if (type === 'percentage') return Math.max(parseSecondsFromClock(currentClock) * number * 10, MIN_PERCENTAGE_TIME);
+    return number * 1000;
+}
+
 function chessMoveReminder() {
     let target =
         document.querySelector(
@@ -80,32 +85,15 @@ function chessMoveReminder() {
                         DEFAULT_STORAGE,
                         function ({who, number, type, repeatEnabled, repeatNumber, repeatType}) {
                             let formattedWho = typeof who === 'object' ? who : OLD_PACK_LOOKUP[who];
-                            let timeToWait;
+                            let timeToTell = calcTime(currentClock, type, number);
 
-                            if (type === 'percentage') {
-                                let seconds =
-                                    parseSecondsFromClock(currentClock) *
-                                    number *
-                                    10;
-                                timeToWait = Math.max(seconds, 2000);
-                            } else {
-                                timeToWait = number * 1000;
-                            }
-                            timer = setTimeout(playAudio, timeToWait, formattedWho);
+                            timer = setTimeout(playAudio, timeToTell, formattedWho);
                             
                             if (repeatEnabled) {
-                                setTimeout(function(){
-                                    if (repeatType === 'percentage') {
-                                        let seconds =
-                                        parseSecondsFromClock(currentClock) *
-                                        repeatNumber *
-                                        10;
-                                        timeToWait = Math.max(seconds, 2000);
-                                    } else {
-                                        timeToWait = repeatNumber * 1000;
-                                    }
-                                    repeatInterval = setInterval(playAudio, timeToWait, formattedWho);
-                                }, timeToWait);
+                                setTimeout(function () {
+                                    const timeToRepeat = Math.max(calcTime(currentClock, repeatType, repeatNumber), MIN_REPEAT_TIME);
+                                    repeatInterval = setInterval(playAudio, timeToRepeat, formattedWho);
+                                }, timeToTell);
                             }
                         }
                     );
@@ -132,6 +120,7 @@ window.onload = function() {
         mutations.forEach(function (mutation) {
             if (oldHref !== document.location.href) {
                 clearTimeout(timer);
+                clearTimeout(repeatInterval);
                 oldHref = document.location.href;
                 setTimeout(chessMoveReminder, 1000);
             }
