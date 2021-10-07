@@ -76,7 +76,7 @@ function onRepeatTypeChange(event) {
     const repeatNumberElement = document.getElementById("repeatNumber");
     const isRepeatTimePercentage = event.target.value === 'percentage';
     repeatNumberElement.min = isRepeatTimePercentage ? 1 : MIN_REPEAT_TIME_SECOND;
-    if(isRepeatTimePercentage && repeatNumberElement.value < MIN_REPEAT_TIME_SECOND) {
+    if (isRepeatTimePercentage && repeatNumberElement.value < MIN_REPEAT_TIME_SECOND) {
         repeatNumberElement.value = MIN_REPEAT_TIME_SECOND;
     }
 }

@@ -5,6 +5,7 @@ let recentRandomNumber = 0;
 
 let timer;
 let audio;
+let repeatIntervalStartTimer;
 let repeatInterval;
 
 function randomPositiveNumber(max) {
@@ -52,6 +53,12 @@ function calcTime(currentClock, type, number) {
     return number * 1000;
 }
 
+function resetTimers() {
+    clearTimeout(timer);
+    clearTimeout(repeatIntervalStartTimer);
+    clearInterval(repeatInterval);
+}
+
 function chessMoveReminder() {
     let target =
         document.querySelector(
@@ -68,8 +75,7 @@ function chessMoveReminder() {
             let currentClock =
                 mutation.target.querySelector('.time') || mutation.target;
             currentClock = currentClock.innerText.replace('/\n/g', '');
-            clearTimeout(timer);
-            clearInterval(repeatInterval);
+            resetTimers();
 
             // For some reason chess.com/live#g=xxx uses clock-playerTurn
             // whereas chess.com/game/live/xxx uses clock-player-turn
@@ -90,7 +96,7 @@ function chessMoveReminder() {
                             timer = setTimeout(playAudio, timeToTell, formattedWho);
                             
                             if (repeatEnabled) {
-                                setTimeout(function () {
+                                repeatIntervalStartTimer = setTimeout(function () {
                                     const timeToRepeat = Math.max(calcTime(currentClock, repeatType, repeatNumber), MIN_REPEAT_TIME);
                                     repeatInterval = setInterval(playAudio, timeToRepeat, formattedWho);
                                 }, timeToTell);
@@ -119,8 +125,7 @@ window.onload = function() {
     let pageReloadObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
             if (oldHref !== document.location.href) {
-                clearTimeout(timer);
-                clearTimeout(repeatInterval);
+                resetTimers();
                 oldHref = document.location.href;
                 setTimeout(chessMoveReminder, 1000);
             }

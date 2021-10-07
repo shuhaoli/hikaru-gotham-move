@@ -51,7 +51,7 @@ function HIKARU_GOTHAM_CONFIG() {
             },
             'repeatTooLowError': {
                 type: "danger",
-                message: "If they constantly keep yelling at you you won't forget, right? 5Head",
+                message: "If they constantly keep yelling at you you won't forget, right? 5Head (Repeat yelling interval too low)",
             }
         },
         MIN_REPEAT_TIME: 5000,
