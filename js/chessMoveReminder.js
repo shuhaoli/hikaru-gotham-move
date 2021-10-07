@@ -1,10 +1,11 @@
-const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, SOUND_PACK_DATA, DEFAULT_SOUND_PACK, DEFAULT_STORAGE, MIN_REPEAT_TIME, MIN_PERCENTAGE_TIME } = HIKARU_GOTHAM_CONFIG();
 let observer;
 let oldHref = document.location.href;
 let recentRandomNumber = 0;
 
 let timer;
 let audio;
+let repeatInterval;
 
 function randomPositiveNumber(max) {
     return Math.floor(Math.random() * max) + 1;
@@ -46,6 +47,11 @@ async function playAudio(who) {
     }
 };
 
+function calcTime(currentClock, type, number) {
+    if (type === 'percentage') return Math.max(parseSecondsFromClock(currentClock) * number * 10, MIN_PERCENTAGE_TIME);
+    return number * 1000;
+}
+
 function chessMoveReminder() {
     let target =
         document.querySelector(
@@ -63,6 +69,7 @@ function chessMoveReminder() {
                 mutation.target.querySelector('.time') || mutation.target;
             currentClock = currentClock.innerText.replace('/\n/g', '');
             clearTimeout(timer);
+            clearInterval(repeatInterval);
 
             // For some reason chess.com/live#g=xxx uses clock-playerTurn
             // whereas chess.com/game/live/xxx uses clock-player-turn
@@ -75,26 +82,19 @@ function chessMoveReminder() {
                 if (audio !== undefined) audio.pause();
                 if (isTurn) {
                     chrome.storage.sync.get(
-                        {
-                            who: DEFAULT_SOUND_PACK,
-                            number: 60,
-                            type: 'seconds',
-                        },
-                        function (data) {
-                            let who = typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who];
-                            let { number, type } = data;
-                            let timeToWait;
+                        DEFAULT_STORAGE,
+                        function ({who, number, type, repeatEnabled, repeatNumber, repeatType}) {
+                            let formattedWho = typeof who === 'object' ? who : OLD_PACK_LOOKUP[who];
+                            let timeToTell = calcTime(currentClock, type, number);
 
-                            if (type === 'percentage') {
-                                let seconds =
-                                    parseSecondsFromClock(currentClock) *
-                                    number *
-                                    10;
-                                timeToWait = Math.max(seconds, 2000);
-                            } else {
-                                timeToWait = number * 1000;
+                            timer = setTimeout(playAudio, timeToTell, formattedWho);
+                            
+                            if (repeatEnabled) {
+                                setTimeout(function () {
+                                    const timeToRepeat = Math.max(calcTime(currentClock, repeatType, repeatNumber), MIN_REPEAT_TIME);
+                                    repeatInterval = setInterval(playAudio, timeToRepeat, formattedWho);
+                                }, timeToTell);
                             }
-                            timer = setTimeout(playAudio, timeToWait, who);
                         }
                     );
                 }
@@ -120,6 +120,7 @@ window.onload = function() {
         mutations.forEach(function (mutation) {
             if (oldHref !== document.location.href) {
                 clearTimeout(timer);
+                clearTimeout(repeatInterval);
                 oldHref = document.location.href;
                 setTimeout(chessMoveReminder, 1000);
             }

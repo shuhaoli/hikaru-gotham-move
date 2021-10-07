@@ -8,7 +8,7 @@
         <script src="js/popup.js"></script>
     </head>
     <body class="popup-body">
-        <div class="container popup-container">
+        <div class="container-fluid popup-container">
             <div class="container-title">
                 <h2>Hikaru and GothamChess Tell You to MOVE</h2>
             </div>
@@ -46,14 +46,27 @@
 
                     <h4 class="settings-question settings-question-second">Choose WHEN you will be notified to move:</h4>
 
-                    <div>
-                        <a>After spending</a>
-                        <input type="number" id="number" name="secondsToWait" class="settings-input">
+                    <div class="mb-1">
+                        <span>After spending</span>
+                        <input type="number" id="number" class="settings-input" min="0">
                         <select id="type" class="form-select settings-form">
                             <option value="seconds">second(s)</option>
                             <option value="percentage">% of remaining time</option>
                         </select>
-                        <a>thinking on one move</a>
+                        <span>thinking on one move.</span>
+                    </div>
+
+                    <div>
+                        <input type="checkbox" id="repeatEnabled" class="repeatEnabled">
+                        <label for="repeatEnabled" class="repeatEnabledOptions">
+                            <span>Keep yelling at me every</span>
+                            <input type="number" id="repeatNumber" class="settings-input" min="5">
+                            <select id="repeatType" class="form-select settings-form">
+                                <option value="seconds">second(s)</option>
+                                <option value="percentage">% of remaining time</option>
+                            </select>
+                            <span>after that.</span>
+                        </label>
                     </div>
 
                     <button id="save" type="button" class="btn btn-primary settings-button">Save</button>

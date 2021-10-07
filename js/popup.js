@@ -1,4 +1,4 @@
-const { OLD_PACK_LOOKUP, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK, ALERT_DATA } = HIKARU_GOTHAM_CONFIG();
+const { OLD_PACK_LOOKUP, AVAILABLE_SOUND_PACK, DEFAULT_SOUND_PACK, DEFAULT_STORAGE, ALERT_DATA, MIN_REPEAT_TIME_SECOND } = HIKARU_GOTHAM_CONFIG();
 let selectedSoundPack = [];
 
 function initCheckboxes(initialValues = DEFAULT_SOUND_PACK) {
@@ -25,15 +25,14 @@ function onPackContainerClick(event) {
 }
 
 function update() {
-    chrome.storage.sync.get({
-        'who': DEFAULT_SOUND_PACK,
-        'number': 60,
-        'type': 'seconds'
-    }, function(data) {
-        // Fallback for version upgrade
-        initCheckboxes(typeof data.who === 'object' ? data.who : OLD_PACK_LOOKUP[data.who]);
-        updateElement('number', data.number);
-        updateElement('type', data.type);
+    chrome.storage.sync.get(DEFAULT_STORAGE, function({who, number, type, repeatEnabled, repeatNumber, repeatType}) {
+        initCheckboxes(typeof who === 'object' ? who : OLD_PACK_LOOKUP[who]); // Fallback for version upgrade
+        updateElement('number', number);
+        updateElement('type', type);
+        document.getElementById('repeatEnabled').checked = repeatEnabled;
+        updateElement('repeatNumber', repeatNumber);
+        updateElement('repeatType', repeatType);
+        document.getElementById('repeatNumber').min = repeatType === 'percentage' ? 1 : MIN_REPEAT_TIME_SECOND;
     });
 }
 
@@ -73,6 +72,15 @@ function showAlert(alertType){
     prevAlertId = newAlert(type, message, prevAlertId);
 }
 
+function onRepeatTypeChange(event) {
+    const repeatNumberElement = document.getElementById("repeatNumber");
+    const isRepeatTimePercentage = event.target.value === 'percentage';
+    repeatNumberElement.min = isRepeatTimePercentage ? 1 : MIN_REPEAT_TIME_SECOND;
+    if(isRepeatTimePercentage && repeatNumberElement.value < MIN_REPEAT_TIME_SECOND) {
+        repeatNumberElement.value = MIN_REPEAT_TIME_SECOND;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("youtube").addEventListener("click", function() {
         chrome.tabs.create({url: 'https://www.youtube.com/c/jackli_gg'});
@@ -84,28 +92,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('who').addEventListener('click', onPackContainerClick);
 
+    document.getElementById('repeatType').addEventListener('change', onRepeatTypeChange);
+
     update();
 
     let saveButton = document.getElementById('save');
     saveButton.addEventListener('click', function() {
         let number = parseFloat(document.getElementById('number').value);
         let type = document.getElementById('type').value;
+        let repeatEnabled = !!document.getElementById('repeatEnabled').checked;
+        let repeatNumber = parseFloat(document.getElementById('repeatNumber').value);
+        let repeatType = document.getElementById('repeatType').value;
 
-        if (!selectedSoundPack.every(pack => AVAILABLE_SOUND_PACK.includes(pack))) {
-            showAlert('invalidError');
-        } else if (type !== 'seconds' && type !== 'percentage') {
-            showAlert('invalidError');
-        } else if (number < 0) {
-            showAlert('negativeError');
-        } else if (type === 'percentage' && number > 100) {
-            showAlert('percentageError');
+        if (!selectedSoundPack.every(pack => AVAILABLE_SOUND_PACK.includes(pack))) return showAlert('invalidError');
+
+        if (!['seconds', 'percentage'].includes(type)) return showAlert('invalidError');
+        if (number < 0) return showAlert('negativeError');
+        if (type === 'percentage' && number > 100) return showAlert('percentageError');
+
+        if (repeatType === 'percentage'){
+            if (repeatNumber > 100) return showAlert('percentageError');
+            if (repeatNumber < 1) return showAlert('repeatTooLowError');
+        } else if (repeatType === 'seconds') {
+            if (repeatNumber < MIN_REPEAT_TIME_SECOND) return showAlert('repeatTooLowError');
         } else {
-            chrome.storage.sync.set({
-                who: selectedSoundPack,
-                number: number,
-                type: type
-            });
-            showAlert('savedSuccessfully');
+            return showAlert('invalidError');
         }
+
+        chrome.storage.sync.set({
+            who: selectedSoundPack,
+            number,
+            type,
+            repeatEnabled,
+            repeatNumber,
+            repeatType,
+        });
+
+        showAlert('savedSuccessfully');
     }, false);
 }, false);
