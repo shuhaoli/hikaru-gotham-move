@@ -1,7 +1,7 @@
 # Hikaru and GothamChess Tell You to MOVE
 Hikaru and GothamChess remind you when you have spent too much time thinking on a move!
 
-This is a web extension compatible with Chrome, Firefox, and Edge. It is designed to work for games on chess.com.
+This is a web extension compatible with Chrome, Firefox, and Edge. It is designed to work for games on both chess.com and lichess.org.
 
 ## Installation Steps
 

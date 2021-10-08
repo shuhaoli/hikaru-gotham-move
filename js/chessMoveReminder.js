@@ -117,24 +117,19 @@ function chessMoveReminder() {
 
 setTimeout(chessMoveReminder, 1000);
 
-let existingWindowOnload = window.onload;
-window.onload = function() {
-    // Lichess on Firefox breaks because we overrode the window.onload
-    existingWindowOnload && existingWindowOnload();
-    let bodyList = document.querySelector('body');
-    let pageReloadObserver = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            if (oldHref !== document.location.href) {
-                resetTimers();
-                oldHref = document.location.href;
-                setTimeout(chessMoveReminder, 1000);
-            }
-        });
+let bodyList = document.querySelector('body');
+let pageReloadObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (oldHref !== document.location.href) {
+            resetTimers();
+            oldHref = document.location.href;
+            setTimeout(chessMoveReminder, 1000);
+        }
     });
-    let config = {
-        childList: true,
-        subtree: true,
-    };
-
-    pageReloadObserver.observe(bodyList, config);
+});
+let config = {
+    childList: true,
+    subtree: true,
 };
+
+pageReloadObserver.observe(bodyList, config);
