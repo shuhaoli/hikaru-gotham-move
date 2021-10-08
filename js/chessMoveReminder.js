@@ -8,6 +8,8 @@ let audio;
 let repeatIntervalStartTimer;
 let repeatInterval;
 
+let lastPlayedClockTime;
+
 function randomPositiveNumber(max) {
     return Math.floor(Math.random() * max) + 1;
 }
@@ -22,12 +24,18 @@ function randomPositiveNumberWithoutRepeat(max) {
     return result;
 }
 
-function parseSecondsFromClock(clock) {
-    let split = clock.split(':').reverse();
-    let hour = parseInt(split[2] || 0);
-    let min = parseInt(split[1]);
-    let sec = parseInt(split[0]);
-    return sec + min * 60 + hour * 3600;
+function getCurrentClock() {
+    return getCurrentClockFromComponent(getClockComponent());
+}
+
+function getClockComponent() {
+    return document.querySelector('#board-layout-player-bottom .clock-component')
+            || document.querySelector('.rclock-bottom');
+}
+
+function getCurrentClockFromComponent(clockComponent) {
+    let clockTimeComponent = clockComponent.querySelector('.time') || clockComponent;
+    return clockTimeComponent.innerText.replaceAll('\n', '');
 }
 
 function getAudio(who) {
@@ -39,6 +47,13 @@ function getAudio(who) {
 
 async function playAudio(who) {
     if (!who.length) return;
+    let currentClock = getCurrentClock();
+    if (currentClock === lastPlayedClockTime) {
+        // The time has not changed. The game is probably over
+        resetTimers();
+        return;
+    }
+    lastPlayedClockTime = currentClock;
     let audioUrl = getAudio(who);
     audio = new Audio(chrome.runtime.getURL(audioUrl));
     try {
@@ -49,8 +64,18 @@ async function playAudio(who) {
 };
 
 function calcTime(currentClock, type, number) {
-    if (type === 'percentage') return Math.max(parseSecondsFromClock(currentClock) * number * 10, MIN_PERCENTAGE_TIME);
+    if (type === 'percentage') {
+        return Math.max(parseSecondsFromClock(currentClock) * number * 10, MIN_PERCENTAGE_TIME);
+    }
     return number * 1000;
+}
+
+function parseSecondsFromClock(clock) {
+    let split = clock.split(':').reverse();
+    let hour = parseInt(split[2] || 0);
+    let min = parseInt(split[1]);
+    let sec = parseInt(split[0]);
+    return sec + min * 60 + hour * 3600;
 }
 
 function resetTimers() {
@@ -60,10 +85,7 @@ function resetTimers() {
 }
 
 function chessMoveReminder() {
-    let target =
-        document.querySelector(
-            '#board-layout-player-bottom .clock-component'
-        ) || document.querySelector('.rclock-bottom');
+    let target = getClockComponent();
 
     if (target !== null) {
         if (observer !== undefined) {
@@ -72,9 +94,7 @@ function chessMoveReminder() {
 
         observer = new MutationObserver(function (mutations) {
             let mutation = mutations[0];
-            let currentClock =
-                mutation.target.querySelector('.time') || mutation.target;
-            currentClock = currentClock.innerText.replace('/\n/g', '');
+            let currentClock = getCurrentClockFromComponent(mutation.target);
             resetTimers();
 
             // For some reason chess.com/live#g=xxx uses clock-playerTurn
