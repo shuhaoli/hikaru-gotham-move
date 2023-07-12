@@ -16,7 +16,7 @@
             ]
         }
     ],
-    "browser_action": {
+    "action": {
         "default_popup": "popup.html"
     },
     "icons": {
@@ -24,9 +24,18 @@
         "48": "icon/icon48.png",
         "128": "icon/icon128.png"
     },
-    "manifest_version": 2,
+    "manifest_version": 3,
     "permissions": ["storage"],
-    "web_accessible_resources": ["audio/*"],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "audio/*"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
+        }
+    ],
     "browser_specific_settings": {
         "gecko": {
             "id": "firefox@jackli.gg"
